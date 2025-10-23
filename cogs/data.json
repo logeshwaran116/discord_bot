@@ -1,0 +1,12 @@
+{
+    "media_only_channels": [],
+    "text_only_channels": [],
+    "gif_blocked_channels": [],
+    "pinned_messages": {},
+    "mute_messages": {},
+    "mute_tasks": {},
+    "wordleboard": {},
+    "wd_active_games": {},
+    "guessboard": {},
+    "guess_active_games": {}
+}

@@ -1,0 +1,13 @@
+# Ignore virtual environment
+venv/
+__pycache__/
+
+# Ignore OS / editor files
+*.log
+*.db
+*.sqlite
+.DS_Store
+
+# Ignore secrets
+.env
+
