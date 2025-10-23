@@ -378,9 +378,8 @@ class Restrictor(commands.Cog):
             if user_id in users:
                 restricted_channels.append(f"<#{channel_id}>")
         if restricted_channels:
-            return await ctx.send(
-                f"🚫 {member.mention} is restricted from mentioning anyone in: \n{'\n'.join(restricted_channels)}"
-            )
+            channels_text = "\n".join(restricted_channels)
+            return await ctx.send(f"🚫 {member.mention} is restricted from mentioning anyone in: \n{channels_text}")
         await ctx.send(f"{member.mention} has no restriction from mentioning")
 
     @commands.command(name="rtdmentionslist")
