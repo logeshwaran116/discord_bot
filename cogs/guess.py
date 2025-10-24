@@ -89,6 +89,7 @@ class Guess(commands.Cog):
         task = self.timeout_tasks.pop(ctx.channel.id, None)
         if task and not task.done():
             task.cancel()
+        data_cog.guess_active_games.pop(ctx.channel.id)
         data_cog.save_data()
         await ctx.send("🛑 Guess the Number stopped.")
 
