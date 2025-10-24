@@ -45,6 +45,7 @@ class Guess(commands.Cog):
             return
         if (max_num - min_num) > 10000:
             await ctx.send("❌ Slow down, pro-wannabe! The limit is 10,000 (try 1 to 10,000).")
+            return
         number = random.randint(min_num, max_num)
         game = {
             "number": number,
