@@ -22,6 +22,13 @@ class Guess(commands.Cog):
                 task.cancel()
         self.timeout_tasks.clear()
 
+    @commands.command(name="guess")
+    async def guess(self,ctx):
+        await ctx.send("`!!startguess` or `!!stg` `[min]` `[max]` `[chances]` → Start a new game\n"
+              "`!!stopguess` or `!!spg` → Stop a running game\n"
+              "`!!guessboard` or `!!gb` → Guess the number Leaderboard\n")
+        return
+
     @commands.command(name="startguess",aliases=["stg"])
     async def start_guess(self, ctx, min_num: int = 1, max_num: int = 100, chances: int = 7):
         data_cog = self.bot.get_cog("DataManager")
@@ -36,12 +43,14 @@ class Guess(commands.Cog):
         if (max_num - min_num) < 99:
             await ctx.send("❌ Bro 🫵 set a baby range… at least 100 numbers needed (try 1–100, noob)")
             return
-
+        if (max_num - min_num) > 10000:
+            await ctx.send("❌ Slow down, pro-wannabe! The limit is 10,000 (try 1 to 10,000).")
         number = random.randint(min_num, max_num)
         game = {
             "number": number,
             "range": (min_num, max_num),
             "chances_left": chances,
+            "started_by": ctx.author.id,
         }
         data_cog.guess_active_games[ctx.channel.id] = game
         data_cog.save_data()
@@ -68,30 +77,30 @@ class Guess(commands.Cog):
     @commands.command(name="stopguess",aliases=["spg"])
     async def stop_guess(self, ctx):
         data_cog = self.bot.get_cog("DataManager")
-        user_id = ctx.author.id
         if not data_cog:
             return await ctx.send("datastore not loaded")
-        game = data_cog.guess_active_games.pop(ctx.channel.id, None)
+        game = data_cog.guess_active_games.get(ctx.channel.id)
         if not game:
             await ctx.send("❌ No active game to stop.")
             return
-
+        if ctx.author.id != game.get("started_by"):
+            return await ctx.send("❌ Only the game starter can stop this game.")
         task = self.timeout_tasks.pop(ctx.channel.id, None)
         if task and not task.done():
             task.cancel()
         data_cog.save_data()
         await ctx.send("🛑 Guess the Number stopped.")
 
-    @commands.command(name="guesslb",aliases=["glb"])
+    @commands.command(name="guessboard",aliases=["gb"])
     async def guess_leaderboard(self, ctx):
         data_cog = self.bot.get_cog("DataManager")
         if not data_cog:
             return await ctx.send("datastore not loaded")
-        if not data_cog.guessboard:
-            await ctx.send("📉 No winners yet!")
-            return
-
-        sorted_lb = sorted(data_cog.guessboard.items(), key=lambda x: x[1], reverse=True)
+        guild_id = str(ctx.guild.id)
+        guild_board = data_cog.guessboard.get(guild_id)
+        if not guild_board:
+            return await ctx.send("🏁 No one has played yet in this server!")
+        sorted_lb = sorted(guild_board.items(), key=lambda x: x[1], reverse=True)
         lines = []
         for i, (uid, wins) in enumerate(sorted_lb[:10]):
             user = ctx.guild.get_member(int(uid)) or await self.bot.fetch_user(int(uid))
@@ -138,7 +147,10 @@ class Guess(commands.Cog):
             await message.channel.send(f"🎉 Correct! {message.author.mention} guessed the number **{number}**! 🎉")
             # Update leaderboard
             user_id = str(message.author.id)
-            data_cog.guessboard[user_id] = data_cog.guessboard.get(user_id, 0) + 1
+            guild_id = str(message.guild.id)
+            if guild_id not in data_cog.guessboard:
+                data_cog.guessboard[guild_id] = {}
+            data_cog.guessboard[guild_id][user_id] = data_cog.guessboard[guild_id].get(user_id, 0) + 1
             data_cog.save_data()
 
             task = self.timeout_tasks.pop(message.channel.id, None)

@@ -63,7 +63,7 @@ class About(commands.Cog):
             value=(
                   "`rasengan` `fireball` `amaterasu` `genjutsu` "
                   "`chidori` `kamehameha` `bankai` " 
-                  "`pistol` `hk` `gatling`"),
+                  "`pistol` `hk` `gatling`", "`sus`"),
                   inline=False
             )
         await ctx.send(embed=embed)
@@ -93,8 +93,8 @@ class About(commands.Cog):
         embed.add_field(
               name="<a:num:1424363626646470726> **Guess the Number**",
               value=">>> Find the hidden number within the range\n"
-              "`!!startguess` or `!!sg` `[min]` `[max]` `[chances]` → Start a new game\n"
-              "`!!stopguess` or `!!stg` → Stop a running game\n"
+              "`!!startguess` or `!!stg` `[min]` `[max]` `[chances]` → Start a new game\n"
+              "`!!stopguess` or `!!spg` → Stop a running game\n"
               "`!!guesslb` → Guess the number Leaderboard\n",
               inline=False
         )
@@ -166,7 +166,8 @@ class About(commands.Cog):
                f"{emoji} **clearmsg** `<message count>`\n\n"
                f"{emoji} **clearmsguser** `<mention>` `<message count>`\n\n"
                f"{emoji} **nogif** \n\n"
-               f"{emoji} **ebgif**\n\n",
+               f"{emoji} **ebgif**\n\n"
+               f"{emoji} **cleargif [message limit]",
                inline=False
           )
           await ctx.send(embed=embed)

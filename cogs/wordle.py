@@ -87,7 +87,7 @@ class EmojiWordle(commands.Cog):
         await ctx.send(f">>> `!!startwordle` or `!!stw` → Start the wordle game\n"
               "`!!stopwordle` or `!!spw` → Stop a running game\n" 
               "`!!wordleboard` or `!!wb` → Wordle Leaderboard\n")
-
+        return
     @commands.command(name="startwordle",aliases=["stw"])
     async def start_wordle(self, ctx):
         data_cog = self.bot.get_cog("DataManager")
@@ -132,11 +132,11 @@ class EmojiWordle(commands.Cog):
         data_cog = self.bot.get_cog("DataManager")
         if not data_cog:
             return await ctx.send("datastore not loaded")
-        if not data_cog.wordleboard:
-            await ctx.send("📉 No one has won a game yet!")
-            return
-
-        sorted_board = sorted(data_cog.wordleboard.items(), key=lambda x: x[1], reverse=True)
+        guild_id = str(ctx.guild.id)
+        guild_board = data_cog.wordleboard.get(guild_id)
+        if not guild_board:
+            return await ctx.send("🏁 No one has played yet in this server!")
+        sorted_board = sorted(guild_board.items(), key=lambda x: x[1], reverse=True)
         lines = []
         for i, (user_id, wins) in enumerate(sorted_board[:10], start=1):
             user = ctx.guild.get_member(int(user_id)) or await self.bot.fetch_user(int(user_id))
@@ -153,9 +153,11 @@ class EmojiWordle(commands.Cog):
         data_cog = self.bot.get_cog("DataManager")
         if not data_cog:
             return await ctx.send("datastore not loaded")
-        if not data_cog.wordleboard:
+        guild_id = str(ctx.guild.id)
+        guild_board = data_cog.wordleboard.get(guild_id)
+        if not guild_board:
             return await ctx.send("⚠️ No data to reset")
-        data_cog.wordleboard = {}
+        del data_cog.wordleboard[guild_id]
         data_cog.save_data()
         await ctx.send("✅ Wordleboard reset successfully.")
 
@@ -167,9 +169,11 @@ class EmojiWordle(commands.Cog):
             return await ctx.send(">>> **Usage:** `!!resetwordleboarduser` `<mention>`")
         if not data_cog:
             return await ctx.send("datastore not loaded")
-        if member.id not in data_cog.wordleboard:
+        guild_id = str(ctx.guild.id)
+        guild_board = data_cog.wordleboard.get(guild_id)
+        if str(member.id) not in guild_board:
             return await ctx.send("⚠️ user has no data to reset")   
-        del data_cog.wordleboard[member.id]
+        del guild_board[member.id]
         data_cog.save_data()
         await ctx.send("✅ User data reset successfully")
 
@@ -203,9 +207,12 @@ class EmojiWordle(commands.Cog):
         data_cog.save_data()
 
         feedback = self.get_feedback(guess, target)
-        str_user_id = str(user_id)
         if guess == target:
-            data_cog.wordleboard[str_user_id] = data_cog.wordleboard.get(str_user_id, 0) + 1
+            str_user_id = str(user_id)
+            guild_id = str(message.guild.id)
+            if guild_id not in data_cog.wordleboard:
+                data_cog.wordleboard[guild_id] = {}
+            data_cog.wordleboard[guild_id][str_user_id] = data_cog.wordleboard[guild_id].get(str_user_id, 0) + 1
             data_cog.save_data()
             await message.channel.send(f"{message.author.display_name}: {' '.join(feedback)}\n🎉 You guessed it!")
             if user_id in self.timeout_tasks:
