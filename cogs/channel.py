@@ -73,9 +73,11 @@ class channel(commands.Cog):
 
     @commands.command(name="mutechannel")
     @commands.has_permissions(manage_channels=True)
-    async def mute_channel(self, ctx, dur: str = "5m"):
+    async def mute_channel(self, ctx, dur: str = None):
         channel = ctx.channel 
         overwrite = channel.overwrites_for(ctx.guild.default_role)
+        if not dur:
+            return await ctx.send("please enter a timer. Try : `45m`, `1h`, `1h30m`, `2d4h`")
         if overwrite.send_messages is False:
             return await ctx.send("⚠️ This channel is already muted.")
         
