@@ -167,8 +167,8 @@ class About(commands.Cog):
                f"{emoji} **clearmsguser** `<mention>` `<message count>`\n\n"
                f"{emoji} **dbgif** \n\n"
                f"{emoji} **ebgif**\n\n"
-               f"{emoji} **cleargif** [message limit]"
-               f"{emoji} **clearmedia** [message limit]",
+               f"{emoji} **cleargif** `[message limit]`\n\n"
+               f"{emoji} **clearmedia** `[message limit]`",
                inline=False
           )
           await ctx.send(embed=embed)
