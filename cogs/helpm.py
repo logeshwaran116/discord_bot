@@ -63,7 +63,7 @@ class About(commands.Cog):
             value=(
                   "`rasengan` `fireball` `amaterasu` `genjutsu` "
                   "`chidori` `kamehameha` `bankai` " 
-                  "`pistol` `hk` `gatling`", "`sus`"),
+                  "`pistol` `hk` `gatling` `sus`"),
                   inline=False
             )
         await ctx.send(embed=embed)
@@ -165,9 +165,10 @@ class About(commands.Cog):
                f"{emoji} **rmpinmsg** \n\n"
                f"{emoji} **clearmsg** `<message count>`\n\n"
                f"{emoji} **clearmsguser** `<mention>` `<message count>`\n\n"
-               f"{emoji} **nogif** \n\n"
+               f"{emoji} **dbgif** \n\n"
                f"{emoji} **ebgif**\n\n"
-               f"{emoji} **cleargif [message limit]",
+               f"{emoji} **cleargif** [message limit]"
+               f"{emoji} **clearmedia** [message limit]",
                inline=False
           )
           await ctx.send(embed=embed)

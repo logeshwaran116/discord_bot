@@ -206,6 +206,7 @@ class member(commands.Cog):
             await ctx.send(f"ℹ️ {member.mention} is not muted.")
 
     @commands.command(name="checkmute")
+    @commands.has_permissions(moderate_members=True)
     async def checkmute(self, ctx, member:discord.Member = None):
         if not member:
             return await ctx.send("**Usage:** `!!checkmute` `<mention>`")
@@ -216,6 +217,7 @@ class member(commands.Cog):
             return await ctx.send (f"{member.display_name} is not muted")
 
     @commands.command(name="rmtm")
+    @commands.has_permissions(moderate_members=True)
     async def rmtm(self, ctx, member:discord.Member = None):
         if not member:
             return await ctx.send("**Usage:** `!!rmtm` `<mention>`")
@@ -232,6 +234,7 @@ class member(commands.Cog):
             await ctx.send(f"ℹ️ {member.mention} is not muted.")
 
     @commands.command(name="checktm")
+    @commands.has_permissions(moderate_members=True)
     async def checktimeout(self, ctx, member: discord.Member = None):
         if not member:
             return await ctx.send("**Usage:** `!!checktm` `<mention>`")
@@ -252,6 +255,7 @@ class member(commands.Cog):
                 )
 
     @commands.command(name="tmlist")
+    @commands.has_permissions(moderate_members=True)
     async def timeout_list(self, ctx):
 
         tm_members = [member for member in ctx.guild.members 
@@ -275,6 +279,7 @@ class member(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name="mutelist")
+    @commands.has_permissions(moderate_members=True)
     async def mute_list(self, ctx):
         """Show all members who have the Muted role."""
         muted_role = discord.utils.get(ctx.guild.roles, name="Muted")

@@ -8,6 +8,12 @@ def is_gif_url(url: str) -> bool:
     clean_url = url.split("?")[0].lower()  # remove query params
     return clean_url.endswith(".gif") or "tenor.com" in clean_url or "giphy.com" in clean_url or "cdn.discordapp.com" in clean_url
 
+def is_media_url(url: str) -> bool:
+    """Check if a URL points to a media file."""
+    clean_url = url.split("?")[0].lower()  # remove query params
+    media_extensions = (".jpg", ".jpeg", ".png", ".mp4", ".mov", ".webm", ".mkv", ".bmp", ".tiff", ".heic", ".avi")
+    return clean_url.endswith(media_extensions) or "cdn.discordapp.com" in clean_url
+
 class channel(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -332,6 +338,10 @@ class channel(commands.Cog):
     @commands.command(name="cleargif")
     @commands.has_permissions(manage_messages=True)
     async def clear_gif(self, ctx, limit: int = 100):
+        if limit <= 0:
+            return await ctx.send("❌ Please specify a positive number of messages.")
+        if limit > 2000:
+            return ctx.send("❌ max limit is 2000")
         def is_gif(message: discord.Message):
             has_gif = (
                     any(is_gif_url(attach.url) for attach in message.attachments)
@@ -341,8 +351,25 @@ class channel(commands.Cog):
         deleted = await ctx.channel.purge(limit=limit, check=is_gif)
         await ctx.send(f"🧹 Deleted {len(deleted)} GIF messages.", delete_after=5)
 
+    @commands.command(name="clearmedia")
+    @commands.has_permissions(manage_messages=True)
+    async def clear_media(self, ctx, limit: int = 100):
+        if limit <= 0:
+            return await ctx.send("❌ Please specify a positive number of messages.")
+        if limit > 2000:
+            return ctx.send("❌ max limit is 2000")
+        def is_media(message: discord.Message):
+            has_media = (
+                any(is_media_url(attach.url) for attach in message.attachments)
+                or is_media_url(message.content)
+            )
+            return has_media
+
+        deleted = await ctx.channel.purge(limit=limit, check=is_media)
+        await ctx.send(f"🧹 Deleted {len(deleted)} media messages.", delete_after=5)
+
     # 🚫 Disable GIFs
-    @commands.command(name="nogif")
+    @commands.command(name="dbgif")
     @commands.has_permissions(manage_channels=True)
     async def disable_gifs(self, ctx):
         data_cog = self.bot.get_cog("DataManager")
@@ -354,7 +381,7 @@ class channel(commands.Cog):
         await ctx.send("🚫 GIFs are now disabled in this channel.")
 
     # ✅ Enable GIFs
-    @commands.command(name="alwgif")
+    @commands.command(name="ebgif")
     @commands.has_permissions(manage_channels=True)
     async def enable_gifs(self, ctx):
         data_cog = self.bot.get_cog("DataManager")
